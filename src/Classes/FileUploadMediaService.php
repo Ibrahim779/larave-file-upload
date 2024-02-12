@@ -1,11 +1,11 @@
 <?php
 
 
-namespace INeop\FileUpload\Classes;
+namespace IIsmail\FileUpload\Classes;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use INeop\FileUpload\Traits\ResizeImage;
+use IIsmail\FileUpload\Traits\ResizeImage;
 
 
 class FileUploadMediaService implements FileUploadInterface

@@ -1,6 +1,6 @@
 <?php
 
-namespace INeop\FileUpload\Classes;
+namespace IIsmail\FileUpload\Classes;
 
 interface FileUploadInterface
 {

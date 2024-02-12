@@ -1,7 +1,7 @@
 <?php
 
 
-namespace INeop\FileUpload\Traits;
+namespace IIsmail\FileUpload\Traits;
 
 use Intervention\Image\Image;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace INeop\FileUpload\Providers;
+namespace IIsmail\FileUpload\Providers;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
-use INeop\FileUpload\Classes\FileUploadMediaService;
-use INeop\FileUpload\Classes\FileUploadService;
+use IIsmail\FileUpload\Classes\FileUploadMediaService;
+use IIsmail\FileUpload\Classes\FileUploadService;
 
 class FileUploadServiceProvider extends ServiceProvider
 {

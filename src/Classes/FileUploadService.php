@@ -1,14 +1,14 @@
 <?php
 
 
-namespace INeop\FileUpload\Classes;
+namespace IIsmail\FileUpload\Classes;
 
 use Exception;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use INeop\FileUpload\Traits\CreateDirectory;
-use INeop\FileUpload\Traits\ResizeImage;
+use IIsmail\FileUpload\Traits\CreateDirectory;
+use IIsmail\FileUpload\Traits\ResizeImage;
 use Intervention\Image\Facades\Image;
 
 class FileUploadService implements FileUploadInterface

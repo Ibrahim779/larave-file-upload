@@ -1,7 +1,7 @@
 <?php
 
 
-namespace INeop\FileUpload\Facades;
+namespace IIsmail\FileUpload\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
