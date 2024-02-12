@@ -28,7 +28,6 @@
             "email": "55800801+Ibrahim779@users.noreply.github.com"
         }
     ],
-    "minimum-stability": "stable",
     "config": {
         "sort-packages": true
     },
