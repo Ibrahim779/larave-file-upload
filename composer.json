@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "IIsmail\\LaravelFileUpload\\": "src/"
+            "IIsmail\\FileUpload\\": "src/"
         }
     },
     "autoload-dev": {
