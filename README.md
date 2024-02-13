@@ -7,6 +7,10 @@ Laravel file upload is a package that allows to you upload a single file or mult
 ```bach
 composer require i-ismail/laravel-file-upload
 ```
+#### Publish Config File
+```bach
+php artisan vendor:publish --tag=file-upload-config
+```
 #### Packages dependency
 1. [Intervention Image documentation](https://image.intervention.io/v2).
 2. [Laravel-media library documentation](https://spatie.be/docs/laravel-medialibrary).
