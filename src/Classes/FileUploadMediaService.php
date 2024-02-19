@@ -1,14 +1,14 @@
 <?php
 
 
-namespace IIsmail\FileUpload\Classes;
+namespace App\Services\FileUpload;
 
+use App\Services\FileUpload\Trait\ResizeImage;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use IIsmail\FileUpload\Traits\ResizeImage;
 
 
-class FileUploadMediaService implements FileUploadInterface
+class FileUploadMediaService
 {
 
     use ResizeImage;
@@ -22,6 +22,7 @@ class FileUploadMediaService implements FileUploadInterface
         $file,
         $fileName,
         $image,
+        $disk = 'public',
         $files = [];
 
 /*
@@ -34,9 +35,10 @@ class FileUploadMediaService implements FileUploadInterface
             foreach ($file as $item){
                 $this->files[] = (new FileUploadService())->make($item);
             }
-        }else{
+        } else {
             $this->file = (new FileUploadService())->make($file);
         }
+
         return $this;
     }
 
@@ -44,17 +46,31 @@ class FileUploadMediaService implements FileUploadInterface
      * @param Model $model
      * @return $this
      */
-//    public function setModel($model)
-//    {
-//        $this->model = $model;
-//
-//        return $this;
-//    }
-
     public function setModel(Model $model)
     {
         $this->model = $model;
 
+        $this->setMedia();
+
+        return $this;
+    }
+
+   /**
+     * @param string $path # Not real path just folder name
+     * @param string $disk # ['local', 'public', 's3', ...]
+     */
+    public function store($collection = 'default')
+    {
+        if ($this->mediaCollection){
+            $this->storeMany($collection, $this->disk);
+            return;
+        }
+
+        $this->media->toMediaCollection($collection, $this->disk);
+    }
+
+    protected function setMedia()
+    {
         if ($this->files) {
             $this->setMultiMedia();
 
@@ -64,8 +80,6 @@ class FileUploadMediaService implements FileUploadInterface
         $this->fileName = $this->file->store();
 
         $this->media = $this->model->addMedia($this->file->getFilePath());
-
-        return $this;
     }
 
     protected function setMultiMedia()
@@ -76,19 +90,6 @@ class FileUploadMediaService implements FileUploadInterface
         }
     }
 
-    /**
-     * @param string $collection
-     * @param string $disk
-     */
-    public function store($collection = 'default', $disk = '')
-    {
-        if ($this->mediaCollection){
-            $this->storeMany($collection, $disk);
-            return;
-        }
-        $this->media->toMediaCollection($collection, $disk);
-    }
-
     protected function storeMany($collection, $disk)
     {
         foreach ($this->mediaCollection as $media){
@@ -97,6 +98,25 @@ class FileUploadMediaService implements FileUploadInterface
     }
 
 
+    /**
+     * @param string $disk
+     * @return FileUploadMediaService
+     */
+    public function disk($disk)
+    {
+        $this->disk = $disk;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getDisk()
+    {
+        return $this->disk;
+    }
 
     /**
      * @return mixed
