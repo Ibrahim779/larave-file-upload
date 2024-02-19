@@ -1,30 +1,35 @@
 <?php
 
 
-namespace IIsmail\FileUpload\Classes;
+namespace App\Services\FileUpload;
 
+use App\Services\FileUpload\Trait\CreateDirectory;
+use App\Services\FileUpload\Trait\HashFileName;
+use App\Services\FileUpload\Trait\ResizeImage;
 use Exception;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use IIsmail\FileUpload\Traits\CreateDirectory;
-use IIsmail\FileUpload\Traits\ResizeImage;
 use Intervention\Image\Facades\Image;
 
-class FileUploadService implements FileUploadInterface
+class FileUploadService
 {
 
-    use ResizeImage, CreateDirectory;
+    use ResizeImage, CreateDirectory, HashFileName;
 
     /**
      * @var
      */
     private
         $file,
-        $fileName,
+        $fullFileName,
         $filePath,
         $quality,
-        $image;
+        $image,
+        $extension,
+        $fileName = null,
+        $disk = 'public';
 
     /**
      * FileUploadService constructor.
@@ -41,6 +46,8 @@ class FileUploadService implements FileUploadInterface
 
         $this->quality = config('file-upload.quality');
 
+        $this->extension = config('file-upload.extension');
+
         return $this;
     }
 
@@ -49,84 +56,61 @@ class FileUploadService implements FileUploadInterface
      * @param string $disk # ['local', 'public', 's3', ...]
      * @return string      # file name
      */
-    public function store($path = '', $disk = '')
+    public function store($path = '')
     {
+        $fileName = $this->getFullFileName();
+
         if ($this->image) {
 
             $this->resizeImage($this->image);
 
-            return $this->storeAsImage($path, $this->getDisk($disk));
+            return $this->storeAsImage($path, $this->disk, $fileName);
         }
 
-        $this->fileName = $this->file->store($path, $this->getDisk($disk));
+        $this->fullFileName = $this->file->storeAs($path, $fileName, $this->disk);
 
         // Create folder if not exists, or abort uploading
-        if (!$this->createDirectoryIfNotExists($path, $this->getDisk($disk))) {
-            return false;
-        }
+        $this->createDirectoryIfNotExists($path, $this->disk);
 
-        $this->filePath = Storage::disk($this->getDisk($disk))->path($this->fileName);
+        $this->filePath = Storage::disk($this->disk)->path($this->fullFileName);
 
-        return $this->fileName;
+        return $this->fullFileName;
     }
 
     /**
      * @param $path
      * @param $disk
-     * @return bool
+     * @return string
      */
-    public function storeAsImage ($path, $disk)
+    public function storeAsImage($path, $disk, $fileName)
     {
-        $this->fileName = $this->file->hashName($path);
-
+        $this->fullFileName = "{$path}/{$fileName}";
+        
         // Create folder if not exists, or abort uploading
-        if (!$this->createDirectoryIfNotExists($path, $disk)) {
-            return false;
-        }
+        $this->createDirectoryIfNotExists($path, $disk);
 
-        $this->filePath = Storage::disk($disk)->path($this->fileName);
+        $this->filePath = Storage::disk($disk)->path($this->fullFileName);
 
         $this->image->save($this->filePath, $this->quality);
 
-        return $this->fileName;
+        return $this->fullFileName;
     }
 
     /**
      * @param $oldFile
-     * @param null $disk
      * @return FileUploadService
      */
-    public function delete($oldFile, $disk = null)
+    public function delete($oldFile)
     {
-        if ($oldFile && Storage::disk($this->getDisk($disk))->exists($oldFile)) {
-            Storage::disk($this->getDisk($disk))->delete($oldFile);
+        if ($oldFile && Storage::disk($this->disk)->exists($oldFile)) {
+            Storage::disk($this->disk)->delete($oldFile);
         }
 
         return $this;
     }
 
     /**
-     * @param $oldFile
-     * @param null $disk
-     * @return void
-     */
-    public static function deleteFile($oldFile, $disk = 'public')
-    {
-        if ($oldFile && Storage::disk($disk)->exists($oldFile)) {
-            Storage::disk($disk)->delete($oldFile);
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFileName()
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * @return mixed
+     * @return string
      */
     public function getFilePath()
     {
@@ -134,12 +118,73 @@ class FileUploadService implements FileUploadInterface
     }
 
     /**
-     * @param null $disk
      * @return string
      */
-    public function getDisk($disk = null)
+    protected function getFileName()
     {
-        return $disk ?: 'public';
+        return $this->fileName ?? $this->hashFileName();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getExtension()
+    {
+        if ($this->image && $this->extension) {
+            return $this->extension;
+        }
+
+        return $this->file->extension();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFullFileName()
+    {
+        return "{$this->getFileName()}.{$this->getExtension()}";
+    }
+
+     /**
+     * @param string $fileName
+     * @return FileUploadService
+     */
+    public function fileName($fileName)
+    {
+        $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    /**
+     * @param string $disk
+     * @return FileUploadService
+     */
+    public function disk($disk)
+    {
+        $this->disk = $disk;
+
+        return $this;
+    }
+
+    /**
+     * @param string $extension
+     * @return FileUploadService
+     */
+    public function extension($extension)
+    {
+        $this->extension = $extension;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getDisk()
+    {
+        return $this->disk;
     }
 
     /**
