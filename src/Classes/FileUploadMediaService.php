@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services\FileUpload;
+namespace IIsmail\FileUpload\Classes;
 
 use IIsmail\FileUpload\Traits\ResizeImage;
 use Exception;
