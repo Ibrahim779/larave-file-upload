@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services\FileUpload\Trait;
+namespace IIsmail\FileUpload\Traits;
 
 use Exception;
 use Illuminate\Support\Facades\Hash;
