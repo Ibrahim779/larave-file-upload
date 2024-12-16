@@ -3,9 +3,9 @@
 
 namespace App\Services\FileUpload;
 
-use App\Services\FileUpload\Trait\CreateDirectory;
-use App\Services\FileUpload\Trait\HashFileName;
-use App\Services\FileUpload\Trait\ResizeImage;
+use IIsmail\FileUpload\Traits\CreateDirectory;
+use IIsmail\FileUpload\Traits\HashFileName;
+use IIsmail\FileUpload\Traits\ResizeImage;
 use Exception;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Hash;

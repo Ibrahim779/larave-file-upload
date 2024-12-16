@@ -3,7 +3,7 @@
 
 namespace App\Services\FileUpload;
 
-use App\Services\FileUpload\Trait\ResizeImage;
+use IIsmail\FileUpload\Traits\ResizeImage;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
